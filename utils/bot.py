@@ -60,10 +60,16 @@ class UPLBot(commands.Bot):
                 ) as response:
 
                     if response.status == 201:
-                        await message.channel.send("Event stored successfully ✅")
+                        # We probably don't want to send a message?
+                        # await message.channel.send("Event stored successfully ✅")
+                        pass
                     else:
                         text = await response.text()
-                        await message.channel.send(f"Backend error: {text}")
+                        # It's better to use logger I believe
+                        logger.warning(f"Backend error: {text}") 
+
+
+                        # await message.channel.send(f"Backend error: {text}")
 
         except aiohttp.ClientError as e:
             await message.channel.send(f"Failed to connect to backend: {e}")
