@@ -40,8 +40,7 @@ class UPLBot(commands.Bot):
         await self.process_commands(message)
          
         if message.channel.id not in CHANNEL_ID:
-            await message.channel.send(f"Cannot scrape from that channel id")
-
+            
             return
         
 
@@ -61,7 +60,6 @@ class UPLBot(commands.Bot):
 
                     if response.status == 201:
                         # We probably don't want to send a message?
-                        # await message.channel.send("Event stored successfully ✅")
                         pass
                     else:
                         text = await response.text()
