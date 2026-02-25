@@ -1,3 +1,7 @@
+<script lang="ts">
+	import Calendar from '$lib/components/Calendar.svelte';
+</script>
+
 <!-- This is the home page (Calendar View) -->
 
-<h1>[write html here]</h1>
+<main class="h-lvh w-full"><Calendar></Calendar></main>
