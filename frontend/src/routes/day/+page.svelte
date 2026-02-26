@@ -51,19 +51,28 @@
 
 <div class="schedule-container">
 	{#each dayEvents as event (event.id)}
-		<div class="event-card">
-			<button class="event-header" type="button" onclick={() => flipArrow(event)}>
+		<div class="event-card w-full rounded-xl bg-white p-2 shadow-sm outline outline-black/6 ">
+			<button class="event-header flex gap-x-2" type="button" onclick={() => flipArrow(event)}>
 				<div class="header-text">
-					<h2 class="title">{event.eventTitle} {event.eventLocation} {event.eventTime}</h2>
-					<p class="time"></p>
+					<h2 class="event-title title font-bold flex gap-x-3">
+						{event.eventTitle}
+						<span class="event-location text-sm"> {event.eventLocation}</span>
+						<span class="event-time text-sm">@ {event.eventTime}</span>
+					</h2>
 				</div>
 				<span class="arrow {event.arrowUp ? 'rotate' : ''}">v</span>
 			</button>
 
 			{#if event.arrowUp}
 				<div class="event-details">
-					<p class="host">{event.eventHost}</p>
-					<p class="description">{event.eventDescription}</p>
+					<h1 class="flex gap-x-1">
+						<p class="host">{event.eventHost}</p>
+						<img class="" src = "" alt = ""/> <!--Host logo-->
+					</h1>
+					<h2 class="flex gap-x-2">
+						<p class="description">{event.eventDescription}</p>
+						<img class="" src = "" alt = ""/> <!--Event image-->
+					</h2>
 				</div>
 			{/if}
 		</div>
@@ -71,16 +80,6 @@
 </div>
 
 <style>
-	.event-header {
-		gap: 10px;
-		display: flex;
-	}
-
-	span {
-		transition: 0.1s;
-		display: inline-block;
-	}
-
 	.rotate {
 		transform: rotate(180deg);
 	}
