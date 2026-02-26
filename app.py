@@ -13,23 +13,35 @@ def init_db():
 
 init_db()
 
-@app.post("/insert", methods=["POST"])
+@app.post("/insert")
 def insert_event():
-    data = request.get_json()
+    request_body = request.get_json()
+    required_fields = {"name", "description", "location", "start", "duration", "food"}
+    missing = required_fields - request_body.keys()
+    if missing:
+        return jsonify({
+            "error": "Missing required fields",
+            "missing": list(missing)
+        }), 400
 
-    con = sqlite3.connect("events.db")
-    cur = con.cursor()
+    if len(request_body.keys()) != 6:
+        return jsonify({"error": "Too many fields in body", "received": list(request_body.keys())}), 400
 
-    cur.execute(
-        "INSERT INTO event(name, description, location, start, duration, food) VALUES (?, ?, ?, ?, ?, ?)",
-        (data["name"], data["description"], data["location"],
-         data["start"], data["duration"], data["food"])
-    )
+    try:
+        con = sqlite3.connect("events.db")
+        cur = con.cursor()
 
-    con.commit()
-    con.close()
+        cur.execute("INSERT INTO event(name, description, location, start, duration, food) VALUES (?, ?, ?, ?, ?, ?)",
+        (request_body["name"], request_body["description"], request_body["location"], request_body["start"], request_body["duration"], request_body["food"]))
 
-    return jsonify({"message": "Event inserted"}), 201
+        con.commit()
+        con.close()
+
+        return jsonify({"message": "Event inserted"}), 201
+
+    except Exception as e:
+        print(e)
+        return jsonify({"message": "Something went wrong while trying to write, try again later"}), 500
 
 @app.route("/retrieve", methods=["GET"])
 def retrieve_events():
