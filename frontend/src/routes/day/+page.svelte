@@ -51,9 +51,9 @@
 
 <div class="schedule-container">
 	{#each dayEvents as event (event.id)}
-		<div class="event-card w-full rounded-xl bg-white p-2 shadow-sm outline outline-black/6 ">
-			<button class="event-header flex gap-x-2" type="button" onclick={() => flipArrow(event)}>
-				<div class="header-text">
+		<div class="event-card w-full rounded-xl  p-2 shadow-sm outline outline-black/6 ">
+			<button class="event-header flex gap-x-2 bg-white hover:bg-gray-100" type="button" onclick={() => flipArrow(event)}>
+				<div class="header-text group">
 					<h2 class="event-title title font-bold flex gap-x-3">
 						{event.eventTitle}
 						<span class="event-location text-sm"> {event.eventLocation}</span>
