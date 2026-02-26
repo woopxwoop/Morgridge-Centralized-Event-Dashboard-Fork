@@ -30,7 +30,6 @@ def insert_event():
     con.close()
 
     return jsonify({"message": "Event inserted"}), 201
-  
 
 @app.route("/retrieve", methods=["GET"])
 def retrieve_events():
@@ -48,6 +47,17 @@ def retrieve_events():
 @app.route("/sample-data", methods=["GET"])
 def sample():
     payload={
-
+        "name": "UPL Research Talk 📚",
+        "description": """The UPL is hosting a talk on getting into research as
+        an undergrad for the first time! I’ll be sharing what I\’ve personally
+        learned about reaching out to labs, finding advisors, and making the
+        most of your time once you’re in. Whether you\'re interested in research
+        for grad school, industry, or pure curiosity, feel free to stop by.""",
+        "location": "Morgridge Hall Rm. 1524",
+        "start": "6:00 PM",
+        "duration": "1 hour",
+        "food": True,
+        "media":
+        ["https://cdn.discordapp.com/attachments/1423716763711045705/1473462011881848842/flyer.jpg?ex=69a180af&is=69a02f2f&hm=48183abc7d49de6070f133fa6ca6c1f18490fe424c85be3624f3b840ae8c2347&"]
     }
     return jsonify(payload)
