@@ -43,3 +43,11 @@ def retrieve_events():
     con.close()
 
     return jsonify(rows)
+
+
+@app.route("/sample-data", methods=["GET"])
+def sample():
+    payload={
+
+    }
+    return jsonify(payload)
