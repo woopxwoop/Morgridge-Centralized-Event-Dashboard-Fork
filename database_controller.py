@@ -1,5 +1,6 @@
 import sqlite3
 
+# class is not complete just tried to start something that will need to change
 class database_controller:
     def __init__(self):
         print("database_controller initialized")
