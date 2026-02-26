@@ -1,22 +1,16 @@
 from flask import Flask, request, jsonify
 import sqlite3
+from database_controller import database_controller
 
 app = Flask(__name__)
-
-def init_db():
-    con = sqlite3.connect("events.db")
-    cur = con.cursor()
-    create_table_query = "CREATE TABLE IF NOT EXISTS events(name, description, location, start, duration, food)"
-    cur.execute(create_table_query)
-    con.commit()
-    con.close()
-
-init_db()
+db = database_controller()
+db.init_event_db()
 
 @app.post("/insert")
 def insert_event():
     request_body = request.get_json()
-    required_fields = {"name", "description", "location", "start", "duration", "food"}
+    required_fields = {"name", "description", "location", "start", "duration",
+                       "food", "media"}
     missing = required_fields - request_body.keys()
     if missing:
         return jsonify({
@@ -24,15 +18,18 @@ def insert_event():
             "missing": list(missing)
         }), 400
 
-    if len(request_body.keys()) != 6:
+    if len(request_body.keys()) != 7:
         return jsonify({"error": "Too many fields in body", "received": list(request_body.keys())}), 400
 
     try:
         con = sqlite3.connect("events.db")
         cur = con.cursor()
 
-        cur.execute("INSERT INTO event(name, description, location, start, duration, food) VALUES (?, ?, ?, ?, ?, ?)",
-        (request_body["name"], request_body["description"], request_body["location"], request_body["start"], request_body["duration"], request_body["food"]))
+        cur.execute("INSERT INTO event(name, description, location, start, duration, food, media) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (request_body["name"], request_body["description"],
+         request_body["location"], request_body["start"],
+         request_body["duration"], request_body["food"],
+         request_body["media"]))
 
         con.commit()
         con.close()
@@ -71,7 +68,4 @@ def sample():
         ["https://cdn.discordapp.com/attachments/1423716763711045705/1473462011881848842/flyer.jpg?ex=69a180af&is=69a02f2f&hm=48183abc7d49de6070f133fa6ca6c1f18490fe424c85be3624f3b840ae8c2347&"]
     }
     return jsonify(payload), 200
-
-
-
 
