@@ -1,12 +1,16 @@
 import discord
 from discord.ext import commands
-from config import OWNERS, PREFIX, CHANNEL_ID, BACKEND_URL, BACKEND_PORT, BACKEND_ROUTE
-import os
+from config import OWNERS, PREFIX, CHANNEL_ID, BACKEND_URL, BACKEND_PORT, BACKEND_ROUTE, GEMINI_API_KEY
+import os, sys
 from pathlib import Path
-import json
-import re
 import logging
 import aiohttp
+from google import genai
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import llmScraper
+
+#import DiscordBot.utils.llmScraper
 
 
 logger = logging.getLogger(__name__)
@@ -16,6 +20,7 @@ class UPLBot(commands.Bot):
         intents = discord.Intents.default()
         intents.members = True
         intents.message_content = True
+        
 
         super().__init__(
             owner_ids=OWNERS,
@@ -24,7 +29,7 @@ class UPLBot(commands.Bot):
         )
 
         self.cogs_loaded = False
-        
+        self.geminiClient = genai.Client(api_key=GEMINI_API_KEY)
 
     async def setup_hook(self):
         await self.load_extensions('./cogs')
@@ -40,38 +45,39 @@ class UPLBot(commands.Bot):
         await self.process_commands(message)
          
         if message.channel.id not in CHANNEL_ID:
-            
             return
-        
-
-        json_payload = {
-            "content": message.content
-        }
 
         try:
+
+            # Will be an empty list if no attachments
+            media = {"media": [attachment.url for attachment in message.attachments]}
+
+            response_json = await llmScraper.summarizer(self.geminiClient, message.content)
+            response_json.update(media)
+
+            json_payload = response_json
+
             async with aiohttp.ClientSession() as session:
                 BASE_URL = f"http://{BACKEND_URL}:{BACKEND_PORT}"
                 FULL_URL = f"{BASE_URL}/{BACKEND_ROUTE}"
 
-                async with session.post(
-                    FULL_URL,
-                    json=json_payload
-                ) as response:
-
+                async with session.post(FULL_URL, json=json_payload) as response:
                     if response.status == 201:
-                        # We probably don't want to send a message?
                         pass
                     else:
                         text = await response.text()
-                        # It's better to use logger I believe
                         logger.warning(f"Backend error: {text}") 
 
 
                         # await message.channel.send(f"Backend error: {text}")
 
+            print(json_payload)
+            
         except aiohttp.ClientError as e:
-            await message.channel.send(f"Failed to connect to backend: {e}")
-
+            #await message.channel.send(f"Failed to connect to backend: {e}")
+            logger.warning(f"Failed to connect to backend: {e}") 
+        except Exception as e:
+            logger.warning(f"on_message error: {e}") 
         
     async def load_extensions(self, filename_):
         loaded = []

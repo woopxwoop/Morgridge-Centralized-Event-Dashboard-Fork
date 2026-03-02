@@ -11,6 +11,7 @@ load_dotenv()
 # Load current .env file
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 # Bot Prefix (e.g. !help, !get_announcements)
 PREFIX = "!"
@@ -28,3 +29,6 @@ CHANNEL_ID = set()
 BACKEND_URL = "127.0.0.1"
 BACKEND_PORT = 5000
 BACKEND_ROUTE = "insert"
+BACKEND_ROUTE_ADDCHANNEL = "addchannel"
+BACKEND_ROUTE_DELCHANNEL = "delchannel"
+BACKEND_ROUTE_CURCHANNEL = "curchannel"

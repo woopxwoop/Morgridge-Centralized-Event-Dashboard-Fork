@@ -1,0 +1,12 @@
+# Small model (less accurate)
+python -m spacy download en_core_web_sm
+
+# Medium Model
+python -m spacy download en_core_web_md
+
+
+
+ Size: Package size indicator, sm, md, lg or trf. sm and trf pipelines have no static word vectors.
+
+# Large Model
+ python -m spacy download en_core_web_lg
