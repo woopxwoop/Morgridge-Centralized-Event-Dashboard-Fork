@@ -62,7 +62,7 @@
 <header class="red-white w-full border-b px-4 py-4">
 	<div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
 		<div class="flex items-center gap-2">
-			<a class="rounded border px-3 py-1 text-sm" href="/">Home</a>
+			<a class="rounded px-3 py-1 text-sm font-bold" href="/">Title?</a>
 			<button
 				type="button"
 				class="rounded border px-3 py-0.5"
