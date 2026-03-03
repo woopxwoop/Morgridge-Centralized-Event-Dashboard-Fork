@@ -1,8 +1,9 @@
 <script lang="ts">
 	import CalendarDayBlock from '$lib/components/CalendarDayBlock.svelte';
-	const today = new Date();
-	let displayedYear = $state(today.getFullYear());
-	let displayedMonth = $state(today.getMonth());
+	import { calendarReferenceDate, calendarStepMode } from '$lib/stores/calendar-ui';
+
+	const displayedYear = $derived($calendarReferenceDate.getFullYear());
+	const displayedMonth = $derived($calendarReferenceDate.getMonth());
 
 	const firstDayOfMonth = $derived(new Date(displayedYear, displayedMonth, 1));
 	const firstDayOfWeek = $derived(firstDayOfMonth.getDay());
@@ -35,44 +36,58 @@
 		)
 	);
 
-	function shiftMonth(delta: number) {
-		const nextMonthDate = new Date(displayedYear, displayedMonth + delta, 1);
-		displayedYear = nextMonthDate.getFullYear();
-		displayedMonth = nextMonthDate.getMonth();
-	}
+	const currentWeekDays = $derived(
+		Array.from({ length: 7 }, (_, index) => {
+			const weekStart = new Date($calendarReferenceDate);
+			weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+			const date = new Date(weekStart);
+			date.setDate(weekStart.getDate() + index);
+
+			return {
+				date,
+				dayNumber: date.getDate(),
+				isCurrentMonth: date.getMonth() === displayedMonth
+			};
+		})
+	);
 </script>
 
-<div class="h-full">
-	<div class="mb-3 flex items-center justify-between">
-		<button type="button" class="rounded border px-3 py-1" onclick={() => shiftMonth(-1)}
-			>Prev</button
-		>
-		<h2 class="text-lg font-semibold">{monthLabel}</h2>
-		<button type="button" class="rounded border px-3 py-1" onclick={() => shiftMonth(1)}
-			>Next</button
-		>
-	</div>
-
-	<table class="h-[80%] w-full table-fixed border-collapse">
-		<thead class="text-center">
+<div class="h-full w-full">
+	<table class="h-full w-full table-fixed border-collapse">
+		<thead>
 			<tr>
 				{#each days as day}
-					<th class="p font-medium">{day}</th>
+					<th class="pb-4 font-medium">{day}</th>
 				{/each}
 			</tr>
 		</thead>
-		<tbody class="h-full grid-rows-6">
-			{#each weeks as week}
-				<tr class="row-span-1">
-					{#each week as day}
-						<td class="p border align-top">
+		{#if $calendarStepMode === 'week'}
+			<tbody>
+				<tr>
+					{#each currentWeekDays as day}
+						<td class="p align-top">
 							<div class={day.isCurrentMonth ? '' : 'opacity-40'}>
 								<CalendarDayBlock date={day.date} dayNumber={day.dayNumber} />
 							</div>
 						</td>
 					{/each}
 				</tr>
-			{/each}
-		</tbody>
+			</tbody>
+		{:else}
+			<tbody class="h-full grid-rows-6">
+				{#each weeks as week}
+					<tr class="row-span-1">
+						{#each week as day}
+							<td class="p align-top">
+								<div class={day.isCurrentMonth ? '' : 'opacity-40'}>
+									<CalendarDayBlock date={day.date} dayNumber={day.dayNumber} />
+								</div>
+							</td>
+						{/each}
+					</tr>
+				{/each}
+			</tbody>
+		{/if}
 	</table>
 </div>
