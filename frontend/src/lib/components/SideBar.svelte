@@ -23,23 +23,32 @@
 	]
 </script>
 
-<aside class="flex h-full w-full flex-col rounded border p-4 hover:overflow-y-auto">
-	<h2 class="mb-2 text-base font-semibold">Upcoming Events</h2>
-	<div class="min-h-32 flex-1 text-sm">
+<aside class="flex h-full w-full flex-col rounded border p-2">
+	<h1 class="mb-1 text-base font-semibold">Upcoming Events</h1>
+	<div class="min-h-32 flex-1 overflow-y-scroll scrollbar-hidden">
 		{#each sidebarGroups as group}
-			<h3 class="font-bold">{group.title}</h3>
+			<h1 class="font-bold text-md my-2 outline outline-black/100">{group.title}</h1>
 			{#each group.events as event (event.id)}
-				<div class="event-card w-full rounded p-2 shadow-sm outline outline-black/6">
-					<h2 class="event-title title flex font-bold">
-						{event.eventTitle}
-						{#if event.food}
-							<span class="food-available">🍕</span>
-						{/if}
-						<span class="event-location text-sm"> {event.eventLocation}</span>
-						<span class="event-time text-sm">@ {event.eventStartTime}</span>
-					</h2>
+				<div class="w-full flex grid grid-flow-row grid-cols-3 gap-1">
+					<div class="event-title text-sm font-bold col-start-1 col-end-2">{event.eventTitle}
+					{#if event.food}
+						<div class="food-available text-sm font-bold">🍕</div>
+					{/if}
+					</div>
+					<span class="event-time text-sm font-bold col-3">{event.eventStartTime}</span>
 				</div>
+				<div class="event-location text-xs"> {event.eventLocation}</div>
 			{/each}
 		{/each}
 	</div>
 </aside>
+
+<style>
+.scrollbar-hidden::-webkit-scrollbar {
+display: none;
+} 
+.scrollbar-hidden {
+-ms-overflow-style: none;
+scrollbar-width: none;
+}
+</style>
