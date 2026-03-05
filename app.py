@@ -5,8 +5,9 @@ from database_controller import database_controller
 app = Flask(__name__)
 db = database_controller()
 db.init_event_db()
+db.init_source_db()
 
-@app.post("/insert")
+@app.post("/insert-event")
 def insert_event():
     request_body = request.get_json()
     required_fields = {"name", "description", "location", "start", "duration",
@@ -18,44 +19,50 @@ def insert_event():
             "missing": list(missing)
         }), 400
 
-    if len(request_body.keys()) != 7:
+    if len(request_body.keys()) != len(required_fields):
         return jsonify({"error": "Too many fields in body", "received": list(request_body.keys())}), 400
 
     try:
-        con = sqlite3.connect("events.db")
-        cur = con.cursor()
-
-        cur.execute("INSERT INTO event(name, description, location, start, duration, food, media) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (request_body["name"], request_body["description"],
-         request_body["location"], request_body["start"],
-         request_body["duration"], request_body["food"],
-         request_body["media"]))
-
-        con.commit()
-        con.close()
-
+        db.insert_event(request_body)
         return jsonify({"message": "Event inserted"}), 201
 
     except Exception as e:
         print(e)
         return jsonify({"message": "Something went wrong while trying to write, try again later"}), 500
 
-@app.route("/retrieve", methods=["GET"])
+@app.route("/retrieve-event", methods=["GET"])
 def retrieve_events():
     try:
-        con = sqlite3.connect("events.db")
-        cur = con.cursor()
-
-        cur.execute("SELECT * FROM event")
-        rows = cur.fetchall()
-
-        con.close()
-
-        return jsonify(rows), 200
+        events = db.retrieve_events()
+        return jsonify(events), 200
+    
     except Exception:
         return jsonify({"msg": "Something went wrong while trying to retrieve, try again later"}), 500
 
-@app.route("/sample-data", methods=["GET"])
+
+@app.route("/insert-discord", methods=["GET"])
+def insert_discord():
+    request_body = request.get_json()
+    required_fields = {"server_id", "channel_ids",}
+    missing = required_fields - request_body.keys()
+    if missing:
+        return jsonify({
+            "error": "Missing required fields",
+            "missing": list(missing)
+        }), 400
+
+    if len(request_body.keys()) != len(required_fields):
+        return jsonify({"error": "Too many fields in body", "received": list(request_body.keys())}), 400
+
+    try:
+        events = db.insert_discord(request_body)
+        return jsonify(events), 200
+    
+    except Exception:
+        return jsonify({"msg": "Something went wrong while trying to retrieve, try again later"}), 500
+
+
+@app.route("/retrieve-sample-event", methods=["GET"])
 def sample():
     payload={
         "name": "UPL Research Talk 📚",

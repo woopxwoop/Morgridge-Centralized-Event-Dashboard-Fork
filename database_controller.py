@@ -25,11 +25,39 @@ class database_controller:
         con.commit()
         con.close()
 
-    def insert_event(self):
-        print("")
+    def insert_event(self, request_body):
+        con = sqlite3.connect("events.db")
+        cur = con.cursor()
+
+        cur.execute("INSERT INTO event(name, description, location, start, duration, food, media) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (request_body["name"], request_body["description"],
+         request_body["location"], request_body["start"],
+         request_body["duration"], request_body["food"],
+         request_body["media"]))
+
+        con.commit()
+        con.close()
+
+    def insert_discord(self, request_body):
+        con = sqlite3.connect("events.db")
+        cur = con.cursor()
+
+        cur.execute("INSERT INTO event(server_id, channel_ids) VALUES (?, ?)",
+        (request_body["server_id"], request_body["channel_ids"]))
+
+        con.commit()
+        con.close()
 
     def retrieve_events(self):
-        print("")
+        con = sqlite3.connect("events.db")
+        cur = con.cursor()
+
+        cur.execute("SELECT * FROM event")
+        rows = cur.fetchall()
+
+        con.close()
+
+        return rows
 
     def retrieve_event(self):
-        print("")
+        return None
