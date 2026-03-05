@@ -32,16 +32,14 @@
 				type="button"
 				onclick={() => viewDetails(event.id)}
 			>
-				<div class="header-text group">
-					<h2 class="event-title title flex font-bold">
-						{event.eventTitle}
-						{#if event.food}
-							<span class="food-available">🍕</span>
-						{/if}
-						<span class="event-location text-sm"> {event.eventLocation}</span>
-						<span class="event-time text-sm">@ {event.eventStartTime}</span>
-					</h2>
-				</div>
+				<h2 class="event-title title flex font-bold inline-block align-middle">
+					{event.eventTitle}
+					{#if event.food}
+						<span class="food-available">🍕</span>
+					{/if}
+					<span class="event-location text-sm"> {event.eventLocation}</span>
+					<span class="event-time text-sm">@ {event.eventStartTime}</span>
+				</h2>	
 				<span class="toggle w-6 h-6"> <img class="{event.toggleClicked ? '' : 'rotate-180'}" src={chevron} alt="toggle" /></span>
 			</button>
 
