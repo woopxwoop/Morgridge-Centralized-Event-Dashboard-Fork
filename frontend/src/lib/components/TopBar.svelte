@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import {
 		calendarReferenceDate,
 		calendarSearchQuery,
@@ -21,10 +22,10 @@
 			}).format(date);
 		}
 
-		const weekStart = new Date(date);
-		weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-		const weekEnd = new Date(weekStart);
-		weekEnd.setDate(weekStart.getDate() + 6);
+		const millisecondsInDay = 24 * 60 * 60 * 1000;
+		const weekStartTime = date.getTime() - date.getDay() * millisecondsInDay;
+		const weekStart = new Date(weekStartTime);
+		const weekEnd = new Date(weekStartTime + 6 * millisecondsInDay);
 
 		const shortFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 		return `${shortFormatter.format(weekStart)} - ${shortFormatter.format(weekEnd)}`;
@@ -57,12 +58,18 @@
 
 		calendarStepMode.set('month');
 	}
+
+	function goToMonthlyView(): void {
+		calendarStepMode.set('month');
+	}
 </script>
 
-<header class="red-white w-full border-b px-4 py-4">
-	<div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
+<header class="red-white h-full w-full border-b px-4 py-4">
+	<div class="mx-auto flex h-full max-w-7xl flex-wrap items-center justify-between gap-3">
 		<div class="flex items-center gap-2">
-			<a class="rounded px-3 py-1 text-sm font-bold" href="/">Title?</a>
+			<a class="rounded px-3 py-1 text-sm font-bold" href={resolve('/')} onclick={goToMonthlyView}
+				>Title?</a
+			>
 			<button
 				type="button"
 				class="rounded border px-3 py-0.5"

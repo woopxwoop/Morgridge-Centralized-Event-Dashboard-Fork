@@ -14,9 +14,7 @@
 </script>
 
 {#if $calendarStepMode === 'day'}
-	<div class="h-full w-full">
-		<DayView {selectedDate} />
-	</div>
+	<DayView {selectedDate} />
 {:else}
 	<Calendar />
 {/if}

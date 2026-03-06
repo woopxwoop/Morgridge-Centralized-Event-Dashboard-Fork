@@ -8,11 +8,11 @@
 
 <main class="mx-auto flex h-full w-[95%] flex-col gap-4 lg:flex-row">
 	{#if $calendarStepMode !== 'day'}
-		<section class="order-last w-full lg:order-first lg:h-full lg:w-64">
+		<section class="order-last h-full w-full lg:order-first lg:w-64">
 			<SideBar />
 		</section>
 	{/if}
-	<section class="h-full w-full">
+	<section class="flex h-[90vh] lg:h-full lg:flex-1">
 		<MainView />
 	</section>
 </main>
