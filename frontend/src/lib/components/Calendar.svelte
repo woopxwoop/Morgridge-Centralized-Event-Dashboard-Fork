@@ -14,20 +14,20 @@
 </script>
 
 <div class="h-full w-full">
-	<table class="h-full w-full table-fixed border-collapse">
+	<table class="calendar-table h-full w-full table-fixed border-collapse">
 		<thead>
 			<tr>
-				{#each CALENDAR_WEEKDAY_LABELS as day}
+				{#each CALENDAR_WEEKDAY_LABELS as day (day)}
 					<th class="pb-4 font-medium">{day}</th>
 				{/each}
 			</tr>
 		</thead>
 		{#if $calendarStepMode === 'week'}
-			<tbody>
+			<tbody class="week-body">
 				<tr>
-					{#each currentWeekDays as day}
-						<td class="p align-top">
-							<div class={day.isCurrentMonth ? '' : 'opacity-40'}>
+					{#each currentWeekDays as day (day.date.getTime())}
+						<td class="p-0 align-top">
+							<div class={`h-full w-full ${day.isCurrentMonth ? '' : 'opacity-40'}`}>
 								<CalendarDayBlock date={day.date} dayNumber={day.dayNumber} />
 							</div>
 						</td>
@@ -35,12 +35,12 @@
 				</tr>
 			</tbody>
 		{:else}
-			<tbody class="h-full grid-rows-6">
-				{#each weeks as week}
-					<tr class="row-span-1">
-						{#each week as day}
-							<td class="p align-top">
-								<div class={day.isCurrentMonth ? '' : 'opacity-40'}>
+			<tbody class="month-body">
+				{#each weeks as week, weekIndex (weekIndex)}
+					<tr>
+						{#each week as day (day.date.getTime())}
+							<td class="p-0 align-top">
+								<div class={`h-full w-full ${day.isCurrentMonth ? '' : 'opacity-40'}`}>
 									<CalendarDayBlock date={day.date} dayNumber={day.dayNumber} />
 								</div>
 							</td>
@@ -51,3 +51,25 @@
 		{/if}
 	</table>
 </div>
+
+<style>
+	.calendar-table {
+		height: 100%;
+	}
+
+	.calendar-table thead {
+		height: 2.5rem;
+	}
+
+	.calendar-table tbody {
+		height: calc(100% - 2.5rem);
+	}
+
+	.calendar-table tbody.week-body > tr {
+		height: 100%;
+	}
+
+	.calendar-table tbody.month-body > tr {
+		height: 16.6667%;
+	}
+</style>

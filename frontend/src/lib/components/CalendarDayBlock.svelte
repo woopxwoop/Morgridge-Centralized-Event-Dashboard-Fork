@@ -20,11 +20,19 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col items-center justify-start gap-1">
-	<button type="button" class="px-1" onclick={openDayView}>{dayNumber}</button>
+<div
+	class="flex h-full w-full flex-col items-center justify-start gap-1 rounded transition-colors hover:bg-(--uwGrayLightest)"
+>
+	<button type="button" class="cursor-pointer px-1" onclick={openDayView}>
+		{dayNumber}
+	</button>
 	{#if visibleEventCount > 0}
-		<span class="rounded-full bg-black px-1.5 py-0.5 text-[10px] leading-none text-white">
+		<button
+			type="button"
+			class="cursor-pointer rounded-full bg-black px-1.5 py-0.5 text-[10px] leading-none text-white"
+			onclick={openDayView}
+		>
 			{visibleEventCount}
-		</span>
+		</button>
 	{/if}
 </div>

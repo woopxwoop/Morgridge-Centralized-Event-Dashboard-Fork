@@ -33,7 +33,7 @@
 					<button
 						type="button"
 						onclick={() => openSidebarEvent(event.eventDay, event.id)}
-						class="block w-full rounded-lg border border-transparent px-2 py-2 text-left transition-colors hover:border-(--uwGrayLight) hover:bg-(--uwGrayLightest)"
+						class="block w-full cursor-pointer rounded-lg border border-transparent px-2 py-2 text-left transition-colors hover:border-(--uwGrayLight) hover:bg-(--uwGrayLightest)"
 					>
 						<div class="flex items-start justify-between gap-2">
 							<span class="text-sm leading-tight font-semibold text-(--uwGrayDark)">
