@@ -1,17 +1,13 @@
 <script lang="ts">
+	import { countEventsOnIsoDate } from '$lib/features/events/utils';
+	import { filteredEvents } from '$lib/stores/events';
+	import { toLocalIsoDate } from '$lib/utils/date';
 	import { calendarReferenceDate, calendarStepMode } from '$lib/stores/calendar-ui';
 
 	let { dayNumber, date }: { dayNumber: number; date: Date } = $props();
 
-	function toLocalIsoDate(value: Date): string {
-		const year = value.getFullYear();
-		// month is 0 indexed, but humans use 1-12
-		const month = String(value.getMonth() + 1).padStart(2, '0');
-		const day = String(value.getDate()).padStart(2, '0');
-		return `${year}-${month}-${day}`;
-	}
-
 	const dateParam = $derived(toLocalIsoDate(date));
+	const visibleEventCount = $derived(countEventsOnIsoDate($filteredEvents, dateParam));
 
 	function openDayView(event: MouseEvent): void {
 		event.preventDefault();
@@ -20,6 +16,11 @@
 	}
 </script>
 
-<div class="flex h-full w-full items-start justify-center">
+<div class="flex h-full w-full flex-col items-center justify-start gap-1">
 	<a class="px-1" href={`/day?date=${dateParam}`} onclick={openDayView}>{dayNumber}</a>
+	{#if visibleEventCount > 0}
+		<span class="rounded-full bg-black px-1.5 py-0.5 text-[10px] leading-none text-white">
+			{visibleEventCount}
+		</span>
+	{/if}
 </div>

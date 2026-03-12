@@ -1,35 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { formatPeriodLabel } from '$lib/features/calendar/view';
 	import {
 		calendarReferenceDate,
 		calendarSearchQuery,
 		calendarStepMode,
-		shiftCalendarReferenceDate,
-		type CalendarStepMode
+		shiftCalendarReferenceDate
 	} from '$lib/stores/calendar-ui';
-
-	function formatPeriodLabel(date: Date, mode: CalendarStepMode): string {
-		if (mode === 'month') {
-			return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
-		}
-
-		if (mode === 'day') {
-			return new Intl.DateTimeFormat('en-US', {
-				weekday: 'short',
-				month: 'short',
-				day: 'numeric',
-				year: 'numeric'
-			}).format(date);
-		}
-
-		const millisecondsInDay = 24 * 60 * 60 * 1000;
-		const weekStartTime = date.getTime() - date.getDay() * millisecondsInDay;
-		const weekStart = new Date(weekStartTime);
-		const weekEnd = new Date(weekStartTime + 6 * millisecondsInDay);
-
-		const shortFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
-		return `${shortFormatter.format(weekStart)} - ${shortFormatter.format(weekEnd)}`;
-	}
 
 	const periodLabel = $derived(formatPeriodLabel($calendarReferenceDate, $calendarStepMode));
 
@@ -68,7 +45,7 @@
 	<div class="mx-auto flex h-full max-w-7xl flex-wrap items-center justify-between gap-3">
 		<div class="flex items-center gap-2">
 			<a class="rounded px-3 py-1 text-sm font-bold" href={resolve('/')} onclick={goToMonthlyView}
-				>Title?</a
+				>CDIS Calendar</a
 			>
 			<button
 				type="button"
