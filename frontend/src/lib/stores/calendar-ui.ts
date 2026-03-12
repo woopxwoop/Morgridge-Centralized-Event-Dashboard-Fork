@@ -5,6 +5,7 @@ export type CalendarStepMode = 'month' | 'week' | 'day';
 export const calendarReferenceDate = writable(new Date());
 export const calendarStepMode = writable<CalendarStepMode>('month');
 export const calendarSearchQuery = writable('');
+export const expandedDayEventId = writable<number | null>(null);
 
 export function shiftCalendarReferenceDate(
 	current: Date,

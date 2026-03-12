@@ -30,53 +30,59 @@
 	}
 </script>
 
-{#if selectedDate}
-	<p>Showing events for: {selectedDate}</p>
-{:else}
-	<p>No date selected. Go back to calendar and choose a day.</p>
-{/if}
-
-<div class="dayEvent-container">
-	{#if dayEvents.length > 0}
-		{#each dayEvents as event (event.id)}
-			<div class="event-card w-full rounded-xl p-2 shadow-sm outline outline-black/6">
-				<button
-					class="event-header flex h-full w-full gap-x-2 rounded-xl bg-white hover:bg-gray-100"
-					type="button"
-					onclick={() => viewDetails(event.id)}
-				>
-					<h2 class="event-title title flex align-middle font-bold">
-						{event.eventTitle}
-						{#if event.food}
-							<span class="food-available">🍕</span>
-						{/if}
-						<span class="event-location text-sm"> {event.eventLocation}</span>
-						<span class="event-time text-sm">@ {event.eventStartTime}</span>
-					</h2>
-					<span class="toggle h-6 w-6">
-						<img
-							class={`transition-transform duration-300 ${isExpanded(event.id) ? '' : 'rotate-180'}`}
-							src={chevron}
-							alt="toggle"
-						/>
-					</span>
-				</button>
-
-				{#if isExpanded(event.id)}
-					<div class="event-details overflow-hidden" transition:slide={{ duration: 320 }}>
-						<h1 class="flex gap-x-1">
-							<p class="host">{event.eventHost}</p>
-							<img class="" src="" alt="" />
-						</h1>
-						<h2 class="flex gap-x-2">
-							<p class="description">{event.eventDescription}</p>
-							<img class="" src="" alt="" />
-						</h2>
-					</div>
-				{/if}
-			</div>
-		{/each}
-	{:else if selectedDate}
-		<p class="text-sm text-gray-500">No events match this date and search query.</p>
+<div class="w-full">
+	{#if selectedDate}
+		<p class="mb-3 text-sm font-medium text-(--uwGrayDark)">Showing events for: {selectedDate}</p>
+	{:else}
+		<p class="mb-3 text-sm text-(--uwGrayDark)/70">
+			No date selected. Go back to calendar and choose a day.
+		</p>
 	{/if}
+
+	<div class="dayEvent-container flex flex-col gap-3">
+		{#if dayEvents.length > 0}
+			{#each dayEvents as event (event.id)}
+				<div
+					class="event-card w-full rounded-xl border border-(--uwGrayLight) bg-(--uwWhite) p-2 shadow-sm"
+				>
+					<button
+						class="event-header flex h-full w-full items-start justify-between gap-x-3 rounded-xl px-1 py-1 transition-colors hover:bg-(--uwGrayLightest)"
+						type="button"
+						onclick={() => viewDetails(event.id)}
+					>
+						<div class="min-w-0 flex-1">
+							<h2 class="event-title truncate text-base font-semibold text-(--uwGrayDark)">
+								{event.eventTitle}{#if event.food}&nbsp;🍕{/if}
+							</h2>
+							<p class="mt-0.5 text-sm text-(--uwGrayDark)/75">{event.eventLocation}</p>
+							<p class="text-sm font-medium text-(--uwRedDark)">@ {event.eventStartTime}</p>
+						</div>
+						<span class="toggle mt-0.5 h-6 w-6 text-(--uwGrayDark)">
+							<img
+								class={`transition-transform duration-300 ease-out ${isExpanded(event.id) ? '' : 'rotate-180'}`}
+								src={chevron}
+								alt="toggle"
+							/>
+						</span>
+					</button>
+
+					{#if isExpanded(event.id)}
+						<div
+							class="event-details mt-2 overflow-hidden rounded-lg border border-(--uwGrayLight) bg-(--uwGrayLightest) px-3 py-2"
+							transition:slide={{ duration: 360 }}
+						>
+							<p class="text-xs font-semibold tracking-wide text-(--uwRedDark) uppercase">Host</p>
+							<p class="text-sm text-(--uwGrayDark)">{event.eventHost}</p>
+							<p class="mt-2 text-xs font-semibold tracking-wide text-(--uwRedDark) uppercase">
+								Details
+							</p>
+							<p class="text-sm text-(--uwGrayDark)">{event.eventDescription}</p>
+						</div>
+					{/if}
+				</div>
+			{/each}
+		{:else if selectedDate}
+			<p class="text-sm text-(--uwGrayDark)/70">No events match this date and search query.</p>
+		{/if}
+	</div>
 </div>
