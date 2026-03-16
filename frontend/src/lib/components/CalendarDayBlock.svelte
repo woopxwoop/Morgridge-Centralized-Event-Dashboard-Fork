@@ -44,7 +44,7 @@
 					calendarStepMode.set('day');	
 				}}
 			>
-				{event.eventTitle}
+			{event.eventTitle.length > 15 ? event.eventTitle.substring(0, 15) + '...' : event.eventTitle}
 			</button>
 		{/each}
 	
