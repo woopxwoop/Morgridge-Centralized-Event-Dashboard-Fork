@@ -1,21 +1,33 @@
 <script lang="ts">
-	import { filteredEvents } from '$lib/stores/events';
+	import { allEvents } from '$lib/stores/events';
 	import { toLocalIsoDate } from '$lib/utils/date';
 	import {
 		calendarReferenceDate,
+		calendarSearchQuery,
 		calendarStepMode,
 		expandedDayEventId
 	} from '$lib/stores/calendar-ui';
 	import { buildDayViewEvents } from '$lib/features/events/day-view';
+	import { getEventSearchMatches } from '$lib/features/events/utils';
 
 	let { dayNumber, date }: { dayNumber: number; date: Date } = $props();
 
 	const dateParam = $derived(toLocalIsoDate(date));
-	const dayEvents = $derived(buildDayViewEvents($filteredEvents, dateParam));
+	const dayEvents = $derived(buildDayViewEvents($allEvents, dateParam));
+	const normalizedQuery = $derived($calendarSearchQuery.trim().toLowerCase());
+	const dayEventMatches = $derived(
+		dayEvents.map((event) => ({
+			event,
+			isMatch: normalizedQuery
+				? getEventSearchMatches(event, normalizedQuery, 'preview').length > 0
+				: true
+		}))
+	);
 	const hasPizzaEvent = $derived(dayEvents.some((event) => event.food));
+	const hasQueryMatches = $derived(dayEventMatches.some((entry) => entry.isMatch));
 
 	const MAX_VISIBLE_EVENTS = 3; // Max number of events to show in the day block before showing the count badge
-	const visibleEvents = $derived(dayEvents.slice(0, MAX_VISIBLE_EVENTS));
+	const visibleEvents = $derived(dayEventMatches.slice(0, MAX_VISIBLE_EVENTS));
 	const extraEventCount = $derived(dayEvents.length - MAX_VISIBLE_EVENTS);
 
 	function openDayView(): void {
@@ -26,7 +38,7 @@
 </script>
 
 <div
-	class="flex h-full w-full flex-col items-center justify-start gap-1 rounded transition-colors hover:bg-(--uwGrayLightest)"
+	class={`flex h-full w-full flex-col items-center justify-start gap-1 rounded transition-colors hover:bg-(--uwGrayLightest) ${normalizedQuery && hasQueryMatches ? 'bg-(--uwGrayLightest)' : ''}`}
 >
 	<div class="relative w-full px-1">
 		<button type="button" class="block w-full cursor-pointer text-center" onclick={openDayView}>
@@ -42,21 +54,27 @@
 	</div>
 
 	<div class="flex flex-col gap-1 overflow-hidden">
-		{#each visibleEvents as event (event.id)}
+		{#each visibleEvents as entry (entry.event.id)}
 			<button
 				type="button"
-				class="w-full cursor-pointer rounded-lg border border-transparent px-1 py-0.5 text-left text-[10px] leading-tight text-(--uwGrayDark) transition-colors hover:border-(--uwGrayLight) hover:bg-(--uwGrayLightest)"
-				title={event.eventTitle}
+				class={`w-full cursor-pointer rounded-lg border px-1 py-0.5 text-left text-[10px] leading-tight transition-colors hover:border-(--uwGrayLight) hover:bg-(--uwGrayLightest) ${
+					normalizedQuery
+						? entry.isMatch
+							? 'border-(--uwRed) bg-(--uwWhite) text-(--uwGrayDark)'
+							: 'border-transparent text-(--uwGrayDark)/45'
+						: 'border-transparent text-(--uwGrayDark)'
+				}`}
+				title={entry.event.eventTitle}
 				onclick={(e) => {
 					e.stopPropagation(); // Prevent the day view from opening when clicking on an event
 					calendarReferenceDate.set(new Date(date));
-					expandedDayEventId.set(event.id);
+					expandedDayEventId.set(entry.event.id);
 					calendarStepMode.set('day');
 				}}
 			>
-				{event.eventTitle.length > 15
-					? event.eventTitle.substring(0, 15) + '...'
-					: event.eventTitle}
+				{entry.event.eventTitle.length > 15
+					? entry.event.eventTitle.substring(0, 15) + '...'
+					: entry.event.eventTitle}
 			</button>
 		{/each}
 

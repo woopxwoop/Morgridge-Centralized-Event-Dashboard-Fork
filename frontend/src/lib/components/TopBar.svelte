@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { EventInfo } from '$lib/mockEvents';
+	import SearchBar from '$lib/components/SearchBar.svelte';
 	import { formatPeriodLabel } from '$lib/features/calendar/view';
 	import {
 		calendarReferenceDate,
-		calendarSearchQuery,
 		calendarStepMode,
 		shiftCalendarReferenceDate
 	} from '$lib/stores/calendar-ui';
+
+	let { events = [] }: { events: EventInfo[] } = $props();
 
 	const periodLabel = $derived(formatPeriodLabel($calendarReferenceDate, $calendarStepMode));
 
@@ -42,8 +45,14 @@
 </script>
 
 <header class="red-white h-full w-full border-b px-4 py-4">
-	<div class="mx-auto flex h-full max-w-7xl flex-wrap items-center justify-between gap-3">
-		<div class="flex items-center gap-2">
+	<div
+		class="mx-auto flex h-full max-w-7xl flex-col gap-3 md:flex-row md:items-center md:justify-between"
+	>
+		<div class="order-1 w-full md:order-2 md:w-auto md:max-w-sm md:flex-1">
+			<SearchBar {events} />
+		</div>
+
+		<div class="order-2 flex flex-wrap items-center gap-2 md:order-1">
 			<a class="rounded px-3 py-1 text-sm font-bold" href={resolve('/')} onclick={goToMonthlyView}
 				>CDIS Calendar</a
 			>
@@ -53,7 +62,7 @@
 				onclick={goPrevious}
 				aria-label="Previous period">&larr;</button
 			>
-			<p class="min-w-24 text-center text-sm font-semibold">{periodLabel}</p>
+			<p class="min-w-20 text-center text-sm font-semibold sm:min-w-24">{periodLabel}</p>
 			<button
 				type="button"
 				class="rounded border px-3 py-0.5"
@@ -71,15 +80,5 @@
 				{:else}Day{/if}
 			</button>
 		</div>
-
-		<label class="w-full max-w-sm flex-1">
-			<span class="sr-only">Search events</span>
-			<input
-				type="search"
-				placeholder="Search events"
-				class="w-full rounded border px-3 py-1.5 text-sm"
-				bind:value={$calendarSearchQuery}
-			/>
-		</label>
 	</div>
 </header>

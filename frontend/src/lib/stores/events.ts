@@ -1,10 +1,10 @@
-import { derived } from 'svelte/store';
-import { mockEvents } from '$lib/mockEvents';
-import { filterEventsBySearchQuery, sortEventsChronologically } from '$lib/features/events/utils';
-import { calendarSearchQuery } from '$lib/stores/calendar-ui';
+import { writable } from 'svelte/store';
+import { mockEvents, type EventInfo } from '$lib/mockEvents';
+import { sortEventsChronologically } from '$lib/features/events/utils';
 
-const allEvents = sortEventsChronologically(mockEvents);
+const initialEvents = sortEventsChronologically(mockEvents);
+export const allEvents = writable<EventInfo[]>(initialEvents);
 
-export const filteredEvents = derived(calendarSearchQuery, ($calendarSearchQuery) =>
-	filterEventsBySearchQuery(allEvents, $calendarSearchQuery)
-);
+export function setAllEvents(events: EventInfo[]): void {
+	allEvents.set(sortEventsChronologically(events));
+}

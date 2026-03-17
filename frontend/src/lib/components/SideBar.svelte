@@ -6,9 +6,9 @@
 		calendarStepMode,
 		expandedDayEventId
 	} from '$lib/stores/calendar-ui';
-	import { filteredEvents } from '$lib/stores/events';
+	import { allEvents } from '$lib/stores/events';
 
-	const sidebarGroups = $derived(buildSidebarGroups(new Date(), $filteredEvents));
+	const sidebarGroups = $derived(buildSidebarGroups(new Date(), $allEvents));
 
 	function openSidebarEvent(eventDay: string, eventId: number): void {
 		calendarReferenceDate.set(parseEventDate(eventDay));

@@ -3,7 +3,7 @@
 	import chevron from '$lib/assets/up-chevron.svg';
 	import { buildDayViewEvents, toggleExpandedEvent } from '$lib/features/events/day-view';
 	import { calendarStepMode } from '$lib/stores/calendar-ui';
-	import { filteredEvents } from '$lib/stores/events';
+	import { allEvents } from '$lib/stores/events';
 	import { slide } from 'svelte/transition';
 
 	let expandedEventIds: number[] = $state([]);
@@ -16,7 +16,7 @@
 		expandedEventId: number | null;
 	} = $props();
 
-	const dayEvents = $derived(buildDayViewEvents($filteredEvents, selectedDate));
+	const dayEvents = $derived(buildDayViewEvents($allEvents, selectedDate));
 
 	$effect(() => {
 		expandedEventIds = expandedEventId != null ? [expandedEventId] : [];
