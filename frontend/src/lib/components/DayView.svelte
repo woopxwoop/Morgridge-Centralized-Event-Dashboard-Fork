@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import chevron from '$lib/assets/up-chevron.svg';
 	import { buildDayViewEvents, toggleExpandedEvent } from '$lib/features/events/day-view';
+	import { calendarStepMode } from '$lib/stores/calendar-ui';
 	import { filteredEvents } from '$lib/stores/events';
 	import { slide } from 'svelte/transition';
 
@@ -28,16 +30,34 @@
 	function isExpanded(eventId: number): boolean {
 		return expandedEventIds.includes(eventId);
 	}
+
+	function goBackToCalendar(): void {
+		calendarStepMode.set('month');
+	}
 </script>
 
 <div class="w-full">
-	{#if selectedDate}
-		<p class="mb-3 text-sm font-medium text-(--uwGrayDark)">Showing events for: {selectedDate}</p>
-	{:else}
-		<p class="mb-3 text-sm text-(--uwGrayDark)/70">
-			No date selected. Go back to calendar and choose a day.
-		</p>
-	{/if}
+	<div class="mb-3 flex items-center justify-between gap-2">
+		<a
+			class="inline-flex items-center gap-1 rounded-lg border border-(--uwGrayLight) bg-(--uwWhite) px-2 py-1 text-sm font-semibold text-(--uwGrayDark) transition-colors hover:bg-(--uwGrayLightest)"
+			href={resolve('/')}
+			onclick={goBackToCalendar}
+			aria-label="Back to other views"
+		>
+			<span aria-hidden="true">←</span>
+			<span>Back</span>
+		</a>
+
+		{#if selectedDate}
+			<p class="text-right text-sm font-medium text-(--uwGrayDark)">
+				Showing events for: {selectedDate}
+			</p>
+		{:else}
+			<p class="text-right text-sm text-(--uwGrayDark)/70">
+				No date selected. Go back to calendar and choose a day.
+			</p>
+		{/if}
+	</div>
 
 	<div class="dayEvent-container flex flex-col gap-3">
 		{#if dayEvents.length > 0}
