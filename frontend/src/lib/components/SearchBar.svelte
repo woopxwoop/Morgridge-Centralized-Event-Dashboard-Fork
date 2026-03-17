@@ -9,7 +9,7 @@
 		parseEventDate
 	} from '$lib/features/events/utils';
 	import { toLocalIsoDate } from '$lib/utils/date';
-	import { calendarSearchQuery } from '$lib/stores/calendar-ui';
+	import { calendarSearchQuery, pizzaOnlyFilter } from '$lib/stores/calendar-ui';
 
 	let { events = [] }: { events: EventInfo[] } = $props();
 
@@ -94,23 +94,52 @@
 		event.preventDefault();
 		onEnter();
 	}
+
+	function togglePizzaFilter(): void {
+		pizzaOnlyFilter.update((current) => !current);
+	}
 </script>
 
 <svelte:window onmousedown={onWindowMouseDown} />
 
 <div class="relative w-full" bind:this={containerElement}>
-	<label class="block w-full">
-		<span class="sr-only">Search events</span>
-		<input
-			type="search"
-			placeholder="Search events"
-			class="w-full rounded border px-3 py-1.5 text-sm"
-			bind:value={query}
-			onfocus={onFocusInput}
-			oninput={onInput}
-			onkeydown={onKeyDown}
-		/>
-	</label>
+	<div class="flex items-center gap-2">
+		<button
+			type="button"
+			class={[
+				'relative h-7 w-14 shrink-0 rounded-full border p-0.5 transition-colors duration-200',
+				$pizzaOnlyFilter
+					? 'border-(--uwRedDark) bg-(--uwRedDark)'
+					: 'border-(--uwGrayLight) bg-(--uwGrayLight)'
+			].join(' ')}
+			onclick={togglePizzaFilter}
+			aria-pressed={$pizzaOnlyFilter}
+			aria-label="Show only events with food"
+			title={$pizzaOnlyFilter ? 'Food filter: on' : 'Food filter: off'}
+		>
+			<span
+				class={[
+					'flex h-6 w-6 items-center justify-center rounded-full text-xs',
+					'shadow-sm transition-transform duration-200',
+					$pizzaOnlyFilter ? 'translate-x-7 bg-(--uwWhite)' : 'translate-x-0 bg-(--uwWhite)'
+				].join(' ')}
+			>
+				🍕
+			</span>
+		</button>
+		<label class="block w-full">
+			<span class="sr-only">Search events</span>
+			<input
+				type="search"
+				placeholder="Search events"
+				class="w-full rounded border px-3 py-1.5 text-sm"
+				bind:value={query}
+				onfocus={onFocusInput}
+				oninput={onInput}
+				onkeydown={onKeyDown}
+			/>
+		</label>
+	</div>
 
 	{#if isDropdownOpen && results.length > 0}
 		<div

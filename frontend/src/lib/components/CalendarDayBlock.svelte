@@ -5,7 +5,8 @@
 		calendarReferenceDate,
 		calendarSearchQuery,
 		calendarStepMode,
-		expandedDayEventId
+		expandedDayEventId,
+		pizzaOnlyFilter
 	} from '$lib/stores/calendar-ui';
 	import { buildDayViewEvents } from '$lib/features/events/day-view';
 	import { getEventSearchMatches } from '$lib/features/events/utils';
@@ -24,7 +25,7 @@
 		}))
 	);
 	const hasPizzaEvent = $derived(dayEvents.some((event) => event.food));
-	const hasQueryMatches = $derived(dayEventMatches.some((entry) => entry.isMatch));
+	const shouldHighlightDayNumber = $derived($pizzaOnlyFilter && hasPizzaEvent);
 
 	const MAX_VISIBLE_EVENTS = 3; // Max number of events to show in the day block before showing the count badge
 	const visibleEvents = $derived(dayEventMatches.slice(0, MAX_VISIBLE_EVENTS));
@@ -38,57 +39,65 @@
 </script>
 
 <div
-	class={`flex h-full w-full flex-col items-center justify-start gap-1 rounded transition-colors hover:bg-(--uwGrayLightest) ${normalizedQuery && hasQueryMatches ? 'bg-(--uwGrayLightest)' : ''}`}
+	class="flex h-full w-full flex-col items-stretch justify-start gap-1 overflow-hidden rounded border border-transparent transition-colors hover:bg-(--uwGrayLightest)"
 >
-	<div class="relative w-full px-1">
-		<button type="button" class="block w-full cursor-pointer text-center" onclick={openDayView}>
+	<div class="w-full px-1">
+		<button
+			type="button"
+			class={`block w-full cursor-pointer text-center ${hasPizzaEvent ? 'font-medium' : ''} ${shouldHighlightDayNumber ? 'text-(--uwRed)' : ''}`}
+			onclick={openDayView}
+		>
 			{dayNumber}
 		</button>
-		{#if hasPizzaEvent}
-			<span
-				class="absolute top-0 right-1"
-				aria-label="Pizza event available"
-				title="Pizza event available">🍕</span
-			>
-		{/if}
 	</div>
 
-	<div class="flex flex-col gap-1 overflow-hidden">
-		{#each visibleEvents as entry (entry.event.id)}
-			<button
-				type="button"
-				class={`w-full cursor-pointer rounded-lg border px-1 py-0.5 text-left text-[10px] leading-tight transition-colors hover:border-(--uwGrayLight) hover:bg-(--uwGrayLightest) ${
-					normalizedQuery
-						? entry.isMatch
-							? 'border-(--uwRed) bg-(--uwWhite) text-(--uwGrayDark)'
-							: 'border-transparent text-(--uwGrayDark)/45'
-						: 'border-transparent text-(--uwGrayDark)'
-				}`}
-				title={entry.event.eventTitle}
-				onclick={(e) => {
-					e.stopPropagation(); // Prevent the day view from opening when clicking on an event
-					calendarReferenceDate.set(new Date(date));
-					expandedDayEventId.set(entry.event.id);
-					calendarStepMode.set('day');
-				}}
-			>
-				{entry.event.eventTitle.length > 15
-					? entry.event.eventTitle.substring(0, 15) + '...'
-					: entry.event.eventTitle}
-			</button>
-		{/each}
+	<div class="w-full min-w-0 overflow-hidden px-1">
+		<div class="flex flex-col gap-1">
+			{#each visibleEvents as entry (entry.event.id)}
+				<button
+					type="button"
+					class={`box-border w-full cursor-pointer rounded-lg border px-1 py-0.5 text-left text-[10px] leading-tight transition-colors hover:border-(--uwBlack) hover:bg-(--uwWhite) hover:text-(--uwBlack) ${
+						normalizedQuery
+							? entry.isMatch
+								? 'border-(--uwRed) bg-(--uwWhite) text-(--uwGrayDark)'
+								: 'border-transparent text-(--uwGrayDark)/45'
+							: 'border-transparent text-(--uwGrayDark)'
+					}`}
+					title={entry.event.eventTitle}
+					onclick={(e) => {
+						e.stopPropagation(); // Prevent the day view from opening when clicking on an event
+						calendarReferenceDate.set(new Date(date));
+						expandedDayEventId.set(entry.event.id);
+						calendarStepMode.set('day');
+					}}
+				>
+					<span class="event-title block">
+						{entry.event.eventTitle}
+					</span>
+				</button>
+			{/each}
 
-		{#if extraEventCount > 0}
-			<button
-				type="button"
-				class="cursor-pointer rounded-full bg-black px-1.5 py-0.5 text-[10px] leading-none text-white"
-				onclick={(e) => {
-					e.stopPropagation();
-					openDayView();
-				}}
-			>
-				+{extraEventCount} more
-			</button>
-		{/if}
+			{#if extraEventCount > 0}
+				<button
+					type="button"
+					class="cursor-pointer rounded-full bg-black px-1.5 py-0.5 text-[10px] leading-none text-white"
+					onclick={(e) => {
+						e.stopPropagation();
+						openDayView();
+					}}
+				>
+					+{extraEventCount} more
+				</button>
+			{/if}
+		</div>
 	</div>
 </div>
+
+<style>
+	.event-title {
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+</style>

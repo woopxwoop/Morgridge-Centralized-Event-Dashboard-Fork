@@ -15,10 +15,14 @@
 		@apply bg-(--uwWhite);
 		@apply text-(--uwBlack);
 	}
+
+	button:hover {
+		@apply cursor-pointer;
+	}
 }
 
 @layer components {
-	header button,
+	header button:not(.pizza-filter-toggle),
 	header a {
 		@apply bg-(--uwRed);
 		@apply text-(--uwWhite);
