@@ -96,7 +96,7 @@ function mouseLeave() {
 							? 'bg-[var(--uwRedLight)] border-[var(--uwRed)] text-(--uwBlack)'
 							: normalizedQuery
 								? entry.isMatch
-									? 'border-(--uwRed) bg-(--uwRed) text-(--uwGrayDark)'
+									? 'border-(--uwRed) bg-(--uwWhite) text-(--uwGrayDark)'
 									: 'border-transparent text-(--uwGrayDark)/45'
 								: 'border-transparent text-(--uwGrayDark)'
 						}`}
