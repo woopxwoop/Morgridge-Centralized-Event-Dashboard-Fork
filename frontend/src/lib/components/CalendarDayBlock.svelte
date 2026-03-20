@@ -50,7 +50,6 @@ function mouseHover(e: MouseEvent, id: number) {
     
 	const overflowsRight = rect.right + gap + tooltipWidth > window.innerWidth;
 	const overflowsLeft = rect.left - gap - tooltipWidth < 0;
-	const overflowsTop = rect.top - height < 0;
 	const overflowsBottom = rect.bottom + height > window.innerHeight;
 
     if (overflowsRight && overflowsLeft) {
@@ -61,13 +60,7 @@ function mouseHover(e: MouseEvent, id: number) {
 		touchRight = false;
 	}
 
-	if (overflowsBottom && overflowsTop) {
-		touchBottom = false; 
-    } else if (overflowsBottom) {
-		touchBottom = true;
-	} else {
-		touchBottom = false;
-	}
+	touchBottom = overflowsBottom;
 
 	hoveredEventId = id;
 }
