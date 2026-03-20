@@ -25,7 +25,7 @@
 		}))
 	);
 	const hasPizzaEvent = $derived(dayEvents.some((event) => event.food));
-	const shouldHighlightDayNumber = $derived($pizzaOnlyFilter && hasPizzaEvent);
+	const shouldHighlightDayEvent = $derived($pizzaOnlyFilter && hasPizzaEvent);
 
 	const MAX_VISIBLE_EVENTS = 3; // Max number of events to show in the day block before showing the count badge
 	const visibleEvents = $derived(dayEventMatches.slice(0, MAX_VISIBLE_EVENTS));
@@ -76,7 +76,7 @@ function mouseLeave() {
 	<div class="w-full px-1">
 		<button
 			type="button"
-			class={`block w-full cursor-pointer text-center ${hasPizzaEvent ? 'font-medium' : ''} ${shouldHighlightDayNumber ? 'text-(--uwRed)' : ''}`}
+			class={`block w-full cursor-pointer text-center`}
 			onclick={openDayView}
 		>
 			{dayNumber}
@@ -91,10 +91,12 @@ function mouseLeave() {
 						type="button"
 						onmouseenter={(e) => mouseHover(e, entry.event.id)}
 						onmouseleave={mouseLeave}
-						class={`box-border max-h-[250px] overflow-hidden w-full cursor-pointer rounded-lg border px-1 py-0.5 text-left text-[10px] leading-tight transition-colors hover:border-(--uwBlack) hover:bg-(--uwWhite) hover:text-(--uwBlack) ${
-							normalizedQuery
+						class={`box-border max-h-[250px] overflow-hidden w-full cursor-pointer rounded-lg border px-1 py-0.5 text-left text-[10px] leading-tight transition-colors hover:border-(--uwBlack) hover:bg-(--uwWhite) hover:text-(--uwBlack) 
+						${	$pizzaOnlyFilter && entry.event.food
+							? 'bg-[var(--uwRedLight)] border-[var(--uwRed)] text-(--uwBlack)'
+							: normalizedQuery
 								? entry.isMatch
-									? 'border-(--uwRed) bg-(--uwWhite) text-(--uwGrayDark)'
+									? 'border-(--uwRed) bg-(--uwRed) text-(--uwGrayDark)'
 									: 'border-transparent text-(--uwGrayDark)/45'
 								: 'border-transparent text-(--uwGrayDark)'
 						}`}
