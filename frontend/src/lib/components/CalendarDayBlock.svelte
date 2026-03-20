@@ -36,10 +36,49 @@
 		expandedDayEventId.set(null);
 		calendarStepMode.set('day');
 	}
+
+	let touchRight = $state(false);
+	let touchBottom = $state(false);
+	let hoveredEventId = $state<number | -9999>(-9999);
+
+function mouseHover(e: MouseEvent, id: number) {
+    const btn = e.currentTarget as HTMLElement;
+    const rect = btn.getBoundingClientRect();
+    const tooltipWidth = 288;
+	const height = 173;
+    const gap = 8;
+    
+	const overflowsRight = rect.right + gap + tooltipWidth > window.innerWidth;
+	const overflowsLeft = rect.left - gap - tooltipWidth < 0;
+	const overflowsTop = rect.top - height < 0;
+	const overflowsBottom = rect.bottom + height > window.innerHeight;
+
+    if (overflowsRight && overflowsLeft) {
+		touchRight = false; 
+    } else if (overflowsRight) {
+        touchRight = true; 
+    } else {
+		touchRight = false;
+	}
+
+	if (overflowsBottom && overflowsTop) {
+		touchBottom = false; 
+    } else if (overflowsBottom) {
+		touchBottom = true;
+	} else {
+		touchBottom = false;
+	}
+
+	hoveredEventId = id;
+}
+
+function mouseLeave() {
+    hoveredEventId = -9999; 
+}
 </script>
 
 <div
-	class="flex h-full w-full flex-col items-stretch justify-start gap-1 overflow-hidden rounded border border-transparent transition-colors hover:bg-(--uwGrayLightest)"
+	class="flex h-full w-full flex-col items-stretch justify-start gap-1 overflow-visible rounded border border-transparent transition-colors hover:bg-(--uwGrayLightest)"
 >
 	<div class="w-full px-1">
 		<button
@@ -51,30 +90,54 @@
 		</button>
 	</div>
 
-	<div class="w-full min-w-0 overflow-hidden px-1">
+	<div class="w-full min-w-0 overflow-visible px-1">
 		<div class="flex flex-col gap-1">
 			{#each visibleEvents as entry (entry.event.id)}
-				<button
-					type="button"
-					class={`box-border w-full cursor-pointer rounded-lg border px-1 py-0.5 text-left text-[10px] leading-tight transition-colors hover:border-(--uwBlack) hover:bg-(--uwWhite) hover:text-(--uwBlack) ${
-						normalizedQuery
-							? entry.isMatch
-								? 'border-(--uwRed) bg-(--uwWhite) text-(--uwGrayDark)'
-								: 'border-transparent text-(--uwGrayDark)/45'
-							: 'border-transparent text-(--uwGrayDark)'
-					}`}
-					title={entry.event.eventTitle}
-					onclick={(e) => {
-						e.stopPropagation(); // Prevent the day view from opening when clicking on an event
-						calendarReferenceDate.set(new Date(date));
-						expandedDayEventId.set(entry.event.id);
-						calendarStepMode.set('day');
-					}}
-				>
-					<span class="event-title block">
-						{entry.event.eventTitle}
-					</span>
-				</button>
+				<div class="relative group w-full hover:z-[100]"> 
+					<button
+						type="button"
+						onmouseenter={(e) => mouseHover(e, entry.event.id)}
+						onmouseleave={mouseLeave}
+						class={`box-border max-h-[250px] overflow-hidden w-full cursor-pointer rounded-lg border px-1 py-0.5 text-left text-[10px] leading-tight transition-colors hover:border-(--uwBlack) hover:bg-(--uwWhite) hover:text-(--uwBlack) ${
+							normalizedQuery
+								? entry.isMatch
+									? 'border-(--uwRed) bg-(--uwWhite) text-(--uwGrayDark)'
+									: 'border-transparent text-(--uwGrayDark)/45'
+								: 'border-transparent text-(--uwGrayDark)'
+						}`}
+						
+						onclick={(e) => {
+							e.stopPropagation(); 
+							calendarReferenceDate.set(new Date(date));
+							expandedDayEventId.set(entry.event.id);
+							calendarStepMode.set('day');
+						}}
+					>
+						<span class="event-title block">
+							{entry.event.eventTitle}
+						</span>
+
+						{#if hoveredEventId === entry.event.id}
+							<div class="absolute pointer-events-auto 
+										${touchRight ? 'z-50 right-full pr-2' : 'z-50 left-full pl-2'}
+										${touchBottom ? 'z-50 bottom-0': 'z-50 top-0'}">
+								<div class="box-border w-72 bg-white border border-gray-200 rounded-lg shadow-xl p-3 transition-all duration-200">
+									<div class="space-y-2"> 
+										<h3 class="text-sm font-bold">{entry.event.eventTitle} {#if entry.event.food}🍕{/if}</h3>
+										<p class="mt-0.5 text-sm text-(--uwGrayDark)/75">{entry.event.eventLocation}</p>
+										<p class="text-sm font-medium text-(--uwRedDark)">@ {entry.event.eventStartTime}</p>
+										<p class="text-sm text-(--uwGrayDark)">
+											{entry.event.eventDescription?.length > 100 
+												? entry.event.eventDescription.slice(0, 100) + '...' 
+												: entry.event.eventDescription}
+										</p>
+									</div>
+								</div>
+							</div>
+						{/if}
+					</button>
+
+				</div> 
 			{/each}
 
 			{#if extraEventCount > 0}
