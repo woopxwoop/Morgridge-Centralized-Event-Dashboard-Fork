@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import type { EventInfo } from '$lib/mockEvents';
 	import {
 		buildHighlightSegments,
@@ -8,14 +6,26 @@
 		getEventSearchMatches,
 		parseEventDate
 	} from '$lib/features/events/utils';
-	import { toLocalIsoDate } from '$lib/utils/date';
-	import { calendarSearchQuery, pizzaOnlyFilter } from '$lib/stores/calendar-ui';
+	import {
+		calendarReferenceDate,
+		calendarSearchQuery,
+		calendarStepMode,
+		expandedDayEventId,
+		pizzaOnlyFilter
+	} from '$lib/stores/calendar-ui';
 
 	let { events = [] }: { events: EventInfo[] } = $props();
 
 	let query = $state('');
 	let isDropdownOpen = $state(false);
 	let containerElement: HTMLDivElement | null = null;
+
+	// Sync local query state when the store is cleared externally (e.g. pressing back)
+	$effect(() => {
+		if (!$calendarSearchQuery) {
+			query = '';
+		}
+	});
 
 	const results = $derived.by(() => {
 		const normalizedQuery = query.trim().toLowerCase();
@@ -50,11 +60,10 @@
 	}
 
 	function jumpTo(event: EventInfo): void {
-		const selectedDate = toLocalIsoDate(parseEventDate(event.eventDay));
-		calendarSearchQuery.set(query.trim());
-		let dayHref = resolve('/day');
-		dayHref += `?date=${encodeURIComponent(selectedDate)}&event=${event.id}`;
-		void goto(dayHref);
+		calendarReferenceDate.set(parseEventDate(event.eventDay));
+		expandedDayEventId.set(event.id);
+		calendarStepMode.set('day');
+		calendarSearchQuery.set('');
 		isDropdownOpen = false;
 		query = '';
 	}

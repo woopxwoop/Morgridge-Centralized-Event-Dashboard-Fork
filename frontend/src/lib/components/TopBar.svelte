@@ -5,8 +5,10 @@
 	import { formatPeriodLabel } from '$lib/features/calendar/view';
 	import {
 		calendarReferenceDate,
+		calendarSearchQuery,
 		calendarStepMode,
-		shiftCalendarReferenceDate
+		shiftCalendarReferenceDate,
+		type CalendarStepMode
 	} from '$lib/stores/calendar-ui';
 
 	let { events = [] }: { events: EventInfo[] } = $props();
@@ -25,22 +27,10 @@
 		);
 	}
 
-	function toggleStepMode(): void {
-		if ($calendarStepMode === 'month') {
-			calendarStepMode.set('week');
-			return;
-		}
-
-		if ($calendarStepMode === 'week') {
-			calendarStepMode.set('day');
-			return;
-		}
-
+	function goToToday(): void {
+		calendarReferenceDate.set(new Date());
 		calendarStepMode.set('month');
-	}
-
-	function goToMonthlyView(): void {
-		calendarStepMode.set('month');
+		calendarSearchQuery.set('');
 	}
 </script>
 
@@ -53,7 +43,7 @@
 		</div>
 
 		<div class="order-2 flex flex-wrap items-center gap-2 md:order-1">
-			<a class="rounded px-3 py-1 text-sm font-bold" href={resolve('/')} onclick={goToMonthlyView}
+			<a class="rounded px-3 py-1 text-sm font-bold" href={resolve('/')} onclick={goToToday}
 				>CDIS Calendar</a
 			>
 			<button
@@ -69,16 +59,15 @@
 				onclick={goNext}
 				aria-label="Next period">&rarr;</button
 			>
-			<button
-				type="button"
-				class="rounded border px-2 py-1 text-sm"
-				onclick={toggleStepMode}
-				aria-label="Toggle calendar view mode"
+			<select
+				value={$calendarStepMode}
+				onchange={(e) => calendarStepMode.set(e.currentTarget.value as CalendarStepMode)}
+				class="cursor-pointer rounded border border-white/30 bg-(--uwRed) px-2 py-1 text-sm text-white hover:bg-(--uwRedDark)"
 			>
-				{#if $calendarStepMode === 'month'}Month
-				{:else if $calendarStepMode === 'week'}Week
-				{:else}Day{/if}
-			</button>
+				<option value="month">Month</option>
+				<option value="week">Week</option>
+				<option value="day">Day</option>
+			</select>
 		</div>
 	</div>
 </header>
